@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Time Tracker</title>
+
+<style>
+
+h1 {
+	text-align: center;
+	font-size: 100px;
+}
+
+
+#number {
+	font-size: 700px;
+	text-align: center;
+}
+
+#record {
+	text-align: center;
+	font-size: 100px;
+}
+
+#button {
+	width: 200px;
+	padding: 10px;
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 20px;
+	cursor: pointer;
+	color: white;
+	background-color: #f95959;
+	font-family: tahoma;
+	border-radius: 5px;
+}
+
+#button:hover {
+	background-color: #bf3e3e;
+}
+
+</style>
+</head>
+<body>
+	<h1>Consecutive days Tommy has been on time for standup:</h1>
+	<div id="number">#</div>
+	<div id="record"></div>
+	<div id="button">Reset</div>
+
+<script src="https://www.gstatic.com/firebasejs/4.1.5/firebase.js"></script>
+<script type="text/javascript">
+
+ // Initialize Firebase
+var config = {
+	apiKey: "AIzaSyCUVzwtYIlp2beln96kIoNldpYx8sc05pg",
+	authDomain: "timer123-fdce6.firebaseapp.com",
+	databaseURL: "https://timer123-fdce6.firebaseio.com",
+	projectId: "timer123-fdce6",
+	storageBucket: "",
+	messagingSenderId: "603833278433"
+};
+
+firebase.initializeApp(config);
+
+var database = firebase.database();
+
+var countApp = (function() {
+
+	var counter = document.getElementById('number');
+	var button = document.getElementById('button');
+	var record = document.getElementById('record');
+	var currentDate;
+	var startDate;
+	var recordCount;
+	var dayDiff;
+
+	setInterval(function(){
+		currentDate = new Date().getTime();
+		var timeDiff = (currentDate - startDate);
+		dayDiff = Math.floor((timeDiff / (1000 * 3600 * 24)));
+		counter.innerHTML = dayDiff;
+	}, 1000);
+
+	database.ref().on('value', function(snapshot) {
+		startDate = snapshot.val().record;
+		recordCount = snapshot.val().recordCount;
+		record.innerHTML = `Record: ${recordCount}`;
+	});
+
+	button.addEventListener('click', function(){
+		alert("Aww, Tommy. Let's start over.");
+		function recordCheck(){
+			if(dayDiff > recordCount){
+				alert("We have a new record");
+				return dayDiff;
+			}
+			return recordCount;
+		}
+		
+		database.ref().update({
+			record: new Date().getTime(),
+			recordCount: recordCheck()
+		})
+	})
+})();
+
+
+</script>
+</body>
+</html>
