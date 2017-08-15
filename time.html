@@ -116,6 +116,9 @@ var countApp = (function() {
 			count: 0,
 			recordCount: recordCheck()
 		})
+
+		database.ref("late").push().set(Date());
+		
 	})
 
 	increment.addEventListener('click', function(){
@@ -124,6 +127,8 @@ var countApp = (function() {
 			count: count,
 			recordCount: recordCheck()
 		})
+
+		database.ref("/on-time").push(Date());
 	})
 })();
 
