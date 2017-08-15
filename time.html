@@ -10,6 +10,7 @@
 h1 {
 	text-align: center;
 	font-size: 100px;
+	margin-bottom: 10px;
 }
 
 
@@ -23,7 +24,11 @@ h1 {
 	font-size: 100px;
 }
 
-#button {
+.buttons {
+	text-align: center;
+}
+
+#reset, #plusCount {
 	width: 200px;
 	padding: 10px;
 	margin: 0 auto;
@@ -31,22 +36,36 @@ h1 {
 	margin-top: 20px;
 	cursor: pointer;
 	color: white;
-	background-color: #f95959;
+	display: inline-block;
 	font-family: tahoma;
 	border-radius: 5px;
 }
 
-#button:hover {
+#reset {
+background-color: #f95959;
+}
+
+#reset:hover {
 	background-color: #bf3e3e;
 }
 
+#plusCount {
+	background-color: #4fd66b;
+}
+
+#plusCount:hover{
+	background-color: #5ab56c;
+}
 </style>
 </head>
 <body>
 	<h1>Consecutive days Tommy has been on time for standup:</h1>
 	<div id="number">#</div>
 	<div id="record"></div>
-	<div id="button">Reset</div>
+	<div class="buttons">
+		<div id="plusCount">On-Time!</div>
+		<div id="reset">Reset</div>
+	</div>
 
 <script src="https://www.gstatic.com/firebasejs/4.1.5/firebase.js"></script>
 <script type="text/javascript">
@@ -68,38 +87,41 @@ var database = firebase.database();
 var countApp = (function() {
 
 	var counter = document.getElementById('number');
-	var button = document.getElementById('button');
+	var reset = document.getElementById('reset');
+	var increment = document.getElementById('plusCount');
 	var record = document.getElementById('record');
-	var currentDate;
-	var startDate;
+	var count;
 	var recordCount;
-	var dayDiff;
 
-	setInterval(function(){
-		currentDate = new Date().getTime();
-		var timeDiff = (currentDate - startDate);
-		dayDiff = Math.floor((timeDiff / (1000 * 3600 * 24)));
-		counter.innerHTML = dayDiff;
-	}, 1000);
+	
 
 	database.ref().on('value', function(snapshot) {
-		startDate = snapshot.val().record;
+		count = snapshot.val().count;
+		counter.innerHTML = count;
 		recordCount = snapshot.val().recordCount;
 		record.innerHTML = `Record: ${recordCount}`;
 	});
 
-	button.addEventListener('click', function(){
-		alert("Aww, Tommy. Let's start over.");
-		function recordCheck(){
-			if(dayDiff > recordCount){
+	function recordCheck(){
+			if(count > recordCount){
 				alert("We have a new record");
-				return dayDiff;
+				return count
 			}
 			return recordCount;
 		}
+
+	reset.addEventListener('click', function(){	
 		
 		database.ref().update({
-			record: new Date().getTime(),
+			count: 0,
+			recordCount: recordCheck()
+		})
+	})
+
+	increment.addEventListener('click', function(){
+		count++
+		database.ref().update({
+			count: count,
 			recordCount: recordCheck()
 		})
 	})
